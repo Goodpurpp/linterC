@@ -15,6 +15,8 @@ class Parser:
 
     @staticmethod
     def check_config_file(config: str):
+        if config is None:
+            return Parse_errors.NO_CONFIG
         if EXTENSION_CONFIG in config:
             return Parse_errors.OK
 

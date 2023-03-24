@@ -1,17 +1,13 @@
 from config_reader.config_reader import Config_reader
+from linter.linter import Linter
 from parser.parser import Parser
 from parser.parse_errors import Parse_errors
-import sys
-from argparse import ArgumentParser
+from parser.cli_parse import cli_parse
 
 
 def main():
-    parser_cli = ArgumentParser(description="Simple linter for C language")
-    parser_cli.add_argument("-config", help="config for lint", type=str)
-    parser_cli.add_argument("-files", help="files", type=str, nargs='*')
-    args = parser_cli.parse_args()
+    args = cli_parse()
     parser_files = Parser()
-    print(args.files)
     if parser_files.check_config_file(args.config) == Parse_errors.NO_CONFIG:
         print(Parse_errors.NO_CONFIG.value)
         return
@@ -22,6 +18,7 @@ def main():
     if code == Parse_errors.NO_EXTENSION_FILES:
         print(code.value)
         return
+    linter = Linter(config, correct_files)
 
 
 if __name__ == "__main__":
