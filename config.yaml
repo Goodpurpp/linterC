@@ -1,0 +1,8 @@
+max-line-length: 120
+
+files:
+  - .c
+  - .h
+
+spaces-before-include: 2
+
