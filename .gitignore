@@ -1,2 +1,9 @@
+#fake dirs
 venv
 __pycache__
+.idea
+#Macos
+.DS_Store
+#C-files
+*.c
+*.h
