@@ -6,3 +6,4 @@ files:
 
 spaces-before-include: 2
 
+format: snakecase

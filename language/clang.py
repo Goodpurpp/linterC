@@ -2,7 +2,9 @@ class Clang:
     def __init__(self):
         self.include = "#include"
         self.calls = ["return"]
-        self.operators = ["+-*:;/%=!&|?()[]{}.", "->"]
+        self.operators = ["+", "-", "*", ":", ";", "/", "%", "=", "!", "&", "|", "?", "(", ")", "[", "]", "{", "}", ".",
+                          "->", "=="]
+        self.comma = [","]
         self.types = ["int", "short", "long", "char", "float", "double",
                       "struct",
                       "void"]
@@ -12,3 +14,4 @@ class Clang:
         points = ["&", "*"]
         self.pointers_refs = [point + typeof for point in points for typeof in
                               self.types]
+        self.libs = [".c", ".h"]

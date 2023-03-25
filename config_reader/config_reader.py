@@ -8,3 +8,4 @@ class Config_reader:
         self.files = data['files']
         self.max_line_len = data['max-line-length']
         self.spaces_before_include = data['spaces-before-include']
+        self.clang_format = data['format']

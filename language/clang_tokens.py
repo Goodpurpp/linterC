@@ -13,3 +13,5 @@ class Clang_tokens(Enum):
     INCLUDE = "INCLUDE"
     OTHER = "OTHER"
     CALL = "CALL"
+    LIB = "LIBRARY"
+    COMMA = "COMMA"
