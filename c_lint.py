@@ -3,6 +3,7 @@ from linter.linter import Linter
 from parser.parser import Parser
 from parser.parse_errors import Parse_errors
 from parser.cli_parse import cli_parse
+import re
 
 
 def main():
@@ -14,11 +15,13 @@ def main():
 
     correct_files = list()
     config = Config_reader(args.config)
-    code = parser_files.file_extension_analyze(args.files, correct_files, config.files)
+    code = parser_files.file_extension_analyze(args.files, correct_files,
+                                               config.files)
     if code == Parse_errors.NO_EXTENSION_FILES:
         print(code.value)
         return
     linter = Linter(config, correct_files)
+    linter.linting()
 
 
 if __name__ == "__main__":
