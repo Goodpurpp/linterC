@@ -1,3 +1,6 @@
+import pytest
+import coverage
+
 from parser.parser import Parser
 from parser.parse_errors import Parse_errors
 
