@@ -4,7 +4,7 @@ from enum import Enum
 class Clang_tokens(Enum):
     OP = "OPERATOR"
     TYPE = "TYPE"
-    STATES = "CONDITIONAL STATES"
+    STATE = "CONDITIONAL STATES"
     COMMENT = "COMMENT"
     PTR = "POINTER OR REF"
     VAR = "VAR"

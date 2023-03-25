@@ -68,7 +68,7 @@ class Linter:
         elif any(val in operators for operators in self.clang_vars.operators):
             token = Clang_tokens.OP
         elif val in self.clang_vars.conditional_states:
-            token = Clang_tokens.STATES
+            token = Clang_tokens.STATE
         elif val in self.clang_vars.types:
             token = Clang_tokens.TYPE
         elif self.clang_vars.comments[0] in val:

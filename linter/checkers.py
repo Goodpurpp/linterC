@@ -19,7 +19,7 @@ def ops_before_space(first, second) -> bool:
     if first[1] == Clang_tokens.VAR:
         return second[1] != Clang_tokens.SPACE and second[1] != Clang_tokens.COMMA and second[
             1] != Clang_tokens.EMPTY_LINE
-    if first[1] == Clang_tokens.OP or first[1] == Clang_tokens.STATES or first[1] == Clang_tokens.COMMA:
+    if first[1] == Clang_tokens.OP or first[1] == Clang_tokens.STATE or first[1] == Clang_tokens.COMMA:
         return second[1] != Clang_tokens.SPACE
     return False
 
