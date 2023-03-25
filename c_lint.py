@@ -14,7 +14,7 @@ def main():
 
     correct_files = list()
     config = Config_reader(args.config)
-    code = parser_files.file_extension_analyze(args.files, correct_files, config)
+    code = parser_files.file_extension_analyze(args.files, correct_files, config.files)
     if code == Parse_errors.NO_EXTENSION_FILES:
         print(code.value)
         return

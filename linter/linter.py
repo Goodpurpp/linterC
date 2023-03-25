@@ -22,6 +22,5 @@ class Linter:
         if first == " " and second == " ":
             pass
 
-
-    def call_warning(self,index):
+    def call_warning(self, index):
         pass
