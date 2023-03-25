@@ -1,6 +1,6 @@
 import re
 from pprint import pprint
-
+from linter.checkers import *
 from config_reader.config_reader import Config_reader
 from language.clang_tokens import Clang_tokens
 from language.clang import Clang
@@ -42,7 +42,7 @@ class Linter:
         str_rex = list(filter(lambda x: x != "", curr_str.split("-")))
         summed_ind = 0
         if len(str_rex) < 1:
-            tokens.append([(num_str, 0), Clang_tokens.EMPTY_LINE.value, "\\n"])
+            tokens.append([(num_str, 0), Clang_tokens.EMPTY_LINE, "\\n"])
             return
         n = 1
         for val in str_rex:
@@ -55,7 +55,7 @@ class Linter:
     def call_warning(self, tokenize):
         print(
             f"{self.curr_file}:{tokenize[0][0]}:{tokenize[0][1]} "
-            f"WARNING. CODE SHOULD BE CLANG FORMATED")
+            f"warning: code should be clang-formatted [-Wclang-format-violations]")
         print(self.code[tokenize[0][0] - 1])
         print(" " * tokenize[0][1] + "^")
 
@@ -87,38 +87,23 @@ class Linter:
         count_empty_line = 0
         curr_n_spaces = 0
         for i in range(len(tokens) - 1):
+            if is_empty_line(tokens[i]):
+                count_empty_line += 1
+            else:
+                count_empty_line = 0
+            if count_empty_line > self.config.spaces_before_include:
+                self.call_warning(tokens[i])
+                count_empty_line = 0
             if tokens[i][2] == "{":
                 curr_n_spaces += 2
             if tokens[i][2] == "}":
                 curr_n_spaces -= 2
-            if tokens[i][0][1] > curr_n_spaces and self.double_space(tokens[i], tokens[i + 1]):
+            if tokens[i][0][1] > curr_n_spaces and double_space(tokens[i], tokens[i + 1]):
                 self.call_warning(tokens[i])
-            if self.ops_before_space(tokens[i], tokens[i + 1]):
+            if ops_before_space(tokens[i], tokens[i + 1]):
                 self.call_warning(tokens[i])
             if self.check_var_with_op(tokens[i]):
                 self.call_warning(tokens[i])
-
-    def double_space(self, first, second) -> bool:
-        return first[1] == Clang_tokens.SPACE and second[
-            1] == Clang_tokens.SPACE and first[0][0] == second[0][0]
-
-    def ops_before_space(self, first, second) -> bool:
-        if first[0][0] != second[0][0]:
-            return False
-        if first[2] == "(" and (second[1] == Clang_tokens.VAR or second[1] == Clang_tokens.TYPE):
-            return False
-        if (first[1] == Clang_tokens.VAR or first[1] == Clang_tokens.TYPE) and second[2] == ")":
-            return False
-        if first[2] == ")" and second[2] == ";":
-            return False
-        if first[1] == Clang_tokens.VAR and (second[2] == ";" or second[2] == "("):
-            return False
-        if first[1] == Clang_tokens.VAR:
-            return second[1] != Clang_tokens.SPACE and second[1] != Clang_tokens.COMMA and second[
-                1] != Clang_tokens.EMPTY_LINE
-        if first[1] == Clang_tokens.OP or first[1] == Clang_tokens.STATES or first[1] == Clang_tokens.COMMA:
-            return second[1] != Clang_tokens.SPACE
-        return False
 
     def check_var_with_op(self, token) -> bool:
         if token[1] != Clang_tokens.VAR or token[2][-3:] != "++":
