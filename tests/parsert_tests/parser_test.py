@@ -2,7 +2,6 @@ from unittest import TestCase, main
 
 from parser.parser import Parser
 from parser.parse_errors import Parse_errors
-from config_reader import config_reader
 
 
 class Parser_test(TestCase):
