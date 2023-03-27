@@ -1,4 +1,3 @@
-from config_reader.config_reader import Config_reader
 from parser.parse_errors import Parse_errors
 
 MIN_FILES = 2
@@ -24,7 +23,8 @@ class Parser:
         return Parse_errors.NO_CONFIG
 
     @staticmethod
-    def file_extension_analyze(files: [str], correct_files: [str], config_files) -> (int, str):
+    def file_extension_analyze(files: [str], correct_files: [str],
+                               config_files) -> (int, str):
         for file in files:
             if any(extension in file for extension in config_files):
                 correct_files.append(file)

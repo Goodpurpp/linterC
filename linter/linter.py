@@ -50,7 +50,8 @@ class Linter:
         for val in str_rex:
             summed_ind += len(val)
             tokens.append(
-                [(num_str, summed_ind - len(val) + 1), self.__check_token(val), val])
+                [(num_str, summed_ind - len(val) + 1), self.__check_token(val),
+                 val])
             n += 1
 
     def __call_warning(self, tokenize):
@@ -106,7 +107,8 @@ class Linter:
                 curr_n_spaces += 2
             if tokens[i][2] == "}":
                 curr_n_spaces -= 2
-            if tokens[i][0][1] > curr_n_spaces and double_space(tokens[i], tokens[i + 1]):
+            if tokens[i][0][1] > curr_n_spaces and double_space(tokens[i],
+                                                                tokens[i + 1]):
                 self.__call_warning(tokens[i])
             if ops_before_space(tokens[i], tokens[i + 1]):
                 self.__call_warning(tokens[i])
@@ -116,4 +118,5 @@ class Linter:
     def __check_var_with_op(self, token) -> bool:
         if token[1] != Clang_tokens.VAR or token[2][-3:] != "++":
             return False
-        return any(op in token[2] for op in self.clang_vars.operators if op != "." and op != '*' and op != "&")
+        return any(op in token[2] for op in self.clang_vars.operators if
+                   op != "." and op != '*' and op != "&")
