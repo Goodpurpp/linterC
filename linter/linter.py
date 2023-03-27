@@ -57,7 +57,8 @@ class Linter:
     def __call_warning(self, tokenize):
         print(
             f"{self.curr_file}:{tokenize[0][0]}:{tokenize[0][1]} "
-            f"warning: code should be clang-formatted [-Wclang-format-violations]")
+            f"warning: code should be clang-formatted "
+            f"[-Wclang-format-violations]")
         print(self.code[tokenize[0][0] - 1])
         print(" " * tokenize[0][1] + "^")
 
