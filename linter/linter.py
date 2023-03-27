@@ -4,6 +4,7 @@ from linter.checkers import *
 from config_reader.config_reader import Config_reader
 from language.clang_tokens import Clang_tokens
 from language.clang import Clang
+from linter.checkers import is_empty_line
 
 
 class Linter:
@@ -18,9 +19,9 @@ class Linter:
 
     def linting(self):
         for file in self.checking_files:
-            self.lint_file(file)
+            self.__lint_file(file)
 
-    def lint_file(self, curr_file) -> None:
+    def __lint_file(self, curr_file) -> None:
         tokens = []
         self.curr_file = curr_file
         with open(curr_file, "r") as checking_file:
@@ -28,12 +29,12 @@ class Linter:
             self.code = checking_file.read().split("\n")
         num = 1
         for cur_str in self.code:
-            self.tokenize_str(cur_str, tokens, num)
+            self.__tokenize_str(cur_str, tokens, num)
             num += 1
-        self.check(tokens)
+        self.__check(tokens)
         # pprint(tokens)
 
-    def tokenize_str(self, curr_str, tokens, num_str) -> None:
+    def __tokenize_str(self, curr_str, tokens, num_str) -> None:
         curr_str = curr_str.replace(" ", "- -")
         curr_str = curr_str.replace("(", "-(-")
         curr_str = curr_str.replace(")", "-)-")
@@ -41,6 +42,7 @@ class Linter:
         curr_str = curr_str.replace(",", "-,-")
         str_rex = list(filter(lambda x: x != "", curr_str.split("-")))
         summed_ind = 0
+        # print(str_rex)
         if len(str_rex) < 1:
             tokens.append([(num_str, 0), Clang_tokens.EMPTY_LINE, "\\n"])
             return
@@ -48,18 +50,17 @@ class Linter:
         for val in str_rex:
             summed_ind += len(val)
             tokens.append(
-                [(num_str, summed_ind - len(val) + 1), self.check_token(val),
-                 val])
+                [(num_str, summed_ind - len(val) + 1), self.__check_token(val), val])
             n += 1
 
-    def call_warning(self, tokenize):
+    def __call_warning(self, tokenize):
         print(
             f"{self.curr_file}:{tokenize[0][0]}:{tokenize[0][1]} "
             f"warning: code should be clang-formatted [-Wclang-format-violations]")
         print(self.code[tokenize[0][0] - 1])
         print(" " * tokenize[0][1] + "^")
 
-    def check_token(self, val) -> Clang_tokens:
+    def __check_token(self, val) -> Clang_tokens:
         token = Clang_tokens.VAR
         if val in self.clang_vars.include:
             token = Clang_tokens.INCLUDE
@@ -83,29 +84,36 @@ class Linter:
             token = Clang_tokens.SPACE
         return token
 
-    def check(self, tokens) -> None:
+    def __check(self, tokens) -> None:
         count_empty_line = 0
         curr_n_spaces = 0
+        summary_len_str = [0, 0]
         for i in range(len(tokens) - 1):
+            if tokens[i][0][0] == summary_len_str[0]:
+                summary_len_str[1] = tokens[i][0][1] + len(tokens[i][2])
+            else:
+                summary_len_str = [tokens[i][0][0], tokens[i][0][1]]
+            if summary_len_str[1] > self.config.max_line_len:
+                self.__call_warning(tokens[i])
             if is_empty_line(tokens[i]):
                 count_empty_line += 1
             else:
                 count_empty_line = 0
             if count_empty_line > self.config.spaces_before_include:
-                self.call_warning(tokens[i])
+                self.__call_warning(tokens[i])
                 count_empty_line = 0
             if tokens[i][2] == "{":
                 curr_n_spaces += 2
             if tokens[i][2] == "}":
                 curr_n_spaces -= 2
             if tokens[i][0][1] > curr_n_spaces and double_space(tokens[i], tokens[i + 1]):
-                self.call_warning(tokens[i])
+                self.__call_warning(tokens[i])
             if ops_before_space(tokens[i], tokens[i + 1]):
-                self.call_warning(tokens[i])
-            if self.check_var_with_op(tokens[i]):
-                self.call_warning(tokens[i])
+                self.__call_warning(tokens[i])
+            if self.__check_var_with_op(tokens[i]):
+                self.__call_warning(tokens[i])
 
-    def check_var_with_op(self, token) -> bool:
+    def __check_var_with_op(self, token) -> bool:
         if token[1] != Clang_tokens.VAR or token[2][-3:] != "++":
             return False
         return any(op in token[2] for op in self.clang_vars.operators if op != "." and op != '*' and op != "&")
