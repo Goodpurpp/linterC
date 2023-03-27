@@ -24,6 +24,7 @@ class Linter:
     def __lint_file(self, curr_file) -> None:
         tokens = []
         self.curr_file = curr_file
+
         with open(curr_file, "r") as checking_file:
             self.include_string = True
             self.code = checking_file.read().split("\n")
