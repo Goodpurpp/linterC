@@ -1,7 +1,8 @@
 from enum import Enum
 
 
-class Clang_tokens(Enum):
+class ClangTokens(Enum):
+    FUNC = "FUNC"
     OP = "OPERATOR"
     TYPE = "TYPE"
     STATE = "CONDITIONAL STATES"
@@ -15,3 +16,4 @@ class Clang_tokens(Enum):
     CALL = "CALL"
     LIB = "LIBRARY"
     COMMA = "COMMA"
+    ARGS = "ARGS"
