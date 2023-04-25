@@ -72,7 +72,7 @@ class Checkers_lint(TestCase):
             [(3, 1), ClangTokens.TYPE, 'void']]), ClangTokens.VAR)
 
     def test_init_conf(self):
-        config_reader = ConfigReader("../../config.yaml")
+        config_reader = ConfigReader("config.yaml")
         self.assertEqual(config_reader.max_line_len, 120)
 
     def test_token_with_op(self, _check_var_with_op=None):
