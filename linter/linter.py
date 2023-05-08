@@ -1,4 +1,3 @@
-import re
 from pprint import pprint
 from linter.checkers import ops_before_space, double_space
 from config_reader.config_reader import ConfigReader
@@ -12,6 +11,8 @@ def _count_args(arg, tokens):
     for token in tokens:
         if (arg[2] == token[2] or arg[2] == token[2][0:-2] or
                 arg[2][0:-2] == token[2]):
+            count += 1
+        if arg in [var[2] for var in tokens]:
             count += 1
     return count
 
@@ -43,7 +44,7 @@ class Linter:
             num += 1
         # pprint(t for t in tokens if t[1] == ClangTokens.ARGS)
         self._check(tokens)
-        self._not_used_vars(tokens)
+        self._not_used_vars(tokens, curr_file)
 
     def __tokenize_str(self, curr_str, tokens, num_str) -> None:
         curr_str = curr_str.replace(" ", "- -")
@@ -53,7 +54,6 @@ class Linter:
         curr_str = curr_str.replace(",", "-,-")
         str_rex = list(filter(lambda x: x != "", curr_str.split("-")))
         summed_ind = 0
-        # print(str_rex)
         if len(str_rex) < 1:
             tokens.append([(num_str, 0), ClangTokens.EMPTY_LINE, "\\n"])
             return
@@ -63,6 +63,8 @@ class Linter:
             tokens.append([(num_str, summed_ind - len(val) + 1),
                            self._check_token(val, tokens), val])
             n += 1
+
+        # pprint(tokens)
 
     def __call_warning(self, tokenize):
         print(
@@ -138,18 +140,39 @@ class Linter:
     def _check_var_with_op(self, token) -> bool:
         if token[1] != ClangTokens.VAR or token[2][-3:] != "++":
             return False
-        print(token)
         return any(op in token[2] for op in self.clang_vars.operators if
                    op != "." and op != "*" and op != "&")
 
-    def _not_used_vars(self, tokens) -> None:
+    def _not_used_vars(self, tokens, curr_file) -> None:
         args = [t for t in tokens if t[1] == ClangTokens.ARGS and
                 len([arg for arg in ("argc", "**argv", "main")
                      if arg != t[2]]) == 3]
-        # pprint(args)
         for arg in args:
             if _count_args(arg, tokens) < 2:
                 self._call_not_use_args(arg)
+            else:
+                args.remove(arg)
+        self._delete_not_used_args(args, curr_file)
+
+    def _delete_not_used_args(self, tokenize, curr_file) -> None:
+        if not len(tokenize):
+            return
+        file = open(curr_file, "r+").readlines()
+        counter = 1
+        is_not_func_line_or_var = True
+        with open(f"{curr_file[0:-2]}_reformat.c", "w+",
+                  encoding="utf-8") as reformat_file:
+            for line in file:
+                if (line == "\n" or
+                        all([counter != token[0][0] for token in tokenize])):
+                    is_not_func_line_or_var = True
+                counter += 1
+                if (any([counter - 1 == token[0][0] for token in tokenize])
+                        or not is_not_func_line_or_var):
+                    # reformat_file.write("\n")
+                    continue
+                reformat_file.write(f"{line}")
+        reformat_file.close()
 
     def _call_not_use_args(self, tokenize) -> None:
         print(
