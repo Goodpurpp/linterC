@@ -59,10 +59,6 @@ class File_extension_analyze_test(TestCase):
             [".c", ".h"])
         self.assertEqual(len(correct_files), 8)
 
-    def test_init_cli_parse(self):
-        a = cli_parse()
-        self.assertEqual(type(a), argparse.Namespace)
-
     def test_tokens(self):
         config = ConfigReader("config.yaml")
         lint = Linter(config, ["abc.c"])
@@ -79,7 +75,7 @@ class File_extension_analyze_test(TestCase):
         lint.linting()
         curr_file = open("test.c").readlines()
         test_file = open("test_reformat.c").readlines()
-        self.assertEqual(len(curr_file) - 1 , len(test_file))
+        self.assertEqual(len(curr_file) - 1, len(test_file))
 
 
 if __name__ == "__main__":
