@@ -40,13 +40,13 @@ class Linter:
             self.code = checking_file.read().split("\n")
         num = 1
         for cur_str in self.code:
-            self.__tokenize_str(cur_str, tokens, num)
+            self._tokenize_str(cur_str, tokens, num)
             num += 1
         # pprint(t for t in tokens if t[1] == ClangTokens.ARGS)
         self._check(tokens)
         self._not_used_vars(tokens, curr_file)
 
-    def __tokenize_str(self, curr_str, tokens, num_str) -> None:
+    def _tokenize_str(self, curr_str, tokens, num_str) -> None:
         curr_str = curr_str.replace(" ", "- -")
         curr_str = curr_str.replace("(", "-(-")
         curr_str = curr_str.replace(")", "-)-")
@@ -63,8 +63,6 @@ class Linter:
             tokens.append([(num_str, summed_ind - len(val) + 1),
                            self._check_token(val, tokens), val])
             n += 1
-
-        # pprint(tokens)
 
     def __call_warning(self, tokenize):
         print(
@@ -169,7 +167,6 @@ class Linter:
                 counter += 1
                 if (any([counter - 1 == token[0][0] for token in tokenize])
                         or not is_not_func_line_or_var):
-                    # reformat_file.write("\n")
                     continue
                 reformat_file.write(f"{line}")
         reformat_file.close()

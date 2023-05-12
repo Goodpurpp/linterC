@@ -2,6 +2,8 @@ import argparse
 from argparse import ArgumentParser
 from unittest import TestCase, main
 
+from config_reader.config_reader import ConfigReader
+from linter.linter import Linter
 from parser.cli_parse import cli_parse
 from parser.parser import Parser
 from parser.parse_errors import ParseErrors
@@ -60,6 +62,24 @@ class File_extension_analyze_test(TestCase):
     def test_init_cli_parse(self):
         a = cli_parse()
         self.assertEqual(type(a), argparse.Namespace)
+
+    def test_tokens(self):
+        config = ConfigReader("config.yaml")
+        lint = Linter(config, ["abc.c"])
+        t = list()
+        lint._tokenize_str("#include <s21_cat.h>", t, 0)
+        q = list()
+        lint._tokenize_str("", q, 0)
+        self.assertEqual(len(q), 1)
+        self.assertEqual(len(t), 3)
+
+    def test_lint(self):
+        config = ConfigReader("config.yaml")
+        lint = Linter(config, ["test.c"])
+        lint.linting()
+        curr_file = open("test.c").readlines()
+        test_file = open("test_reformat.c").readlines()
+        self.assertEqual(len(curr_file) - 1 , len(test_file))
 
 
 if __name__ == "__main__":
