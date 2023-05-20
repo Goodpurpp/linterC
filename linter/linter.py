@@ -17,6 +17,26 @@ def _count_args(arg, tokens):
     return count
 
 
+def _delete_not_used_args(tokenize, curr_file) -> None:
+    if not len(tokenize):
+        return
+    file = open(curr_file, "r+").readlines()
+    counter = 1
+    is_not_func_line_or_var = True
+    with open(f"{curr_file[0:-2]}_reformat.c", "w+",
+              encoding="utf-8") as reformat_file:
+        for line in file:
+            if (line == "\n" or
+                    all([counter != token[0][0] for token in tokenize])):
+                is_not_func_line_or_var = True
+            counter += 1
+            if (any([counter - 1 == token[0][0] for token in tokenize])
+                    or not is_not_func_line_or_var):
+                continue
+            reformat_file.write(f"{line}")
+    reformat_file.close()
+
+
 class Linter:
     def __init__(self, config: ConfigReader, correct_files: list[str]):
         self.config = config
@@ -42,7 +62,6 @@ class Linter:
         for cur_str in self.code:
             self._tokenize_str(cur_str, tokens, num)
             num += 1
-        # pprint(t for t in tokens if t[1] == ClangTokens.ARGS)
         self._check(tokens)
         self._not_used_vars(tokens, curr_file)
 
@@ -64,7 +83,7 @@ class Linter:
                            self._check_token(val, tokens), val])
             n += 1
 
-    def __call_warning(self, tokenize):
+    def _call_warning(self, tokenize):
         print(
             f"{self.curr_file}:{tokenize[0][0]}:{tokenize[0][1]} "
             f"warning: code should be clang-formatted "
@@ -150,26 +169,7 @@ class Linter:
                 self._call_not_use_args(arg)
             else:
                 args.remove(arg)
-        self._delete_not_used_args(args, curr_file)
-
-    def _delete_not_used_args(self, tokenize, curr_file) -> None:
-        if not len(tokenize):
-            return
-        file = open(curr_file, "r+").readlines()
-        counter = 1
-        is_not_func_line_or_var = True
-        with open(f"{curr_file[0:-2]}_reformat.c", "w+",
-                  encoding="utf-8") as reformat_file:
-            for line in file:
-                if (line == "\n" or
-                        all([counter != token[0][0] for token in tokenize])):
-                    is_not_func_line_or_var = True
-                counter += 1
-                if (any([counter - 1 == token[0][0] for token in tokenize])
-                        or not is_not_func_line_or_var):
-                    continue
-                reformat_file.write(f"{line}")
-        reformat_file.close()
+        _delete_not_used_args(args, curr_file)
 
     def _call_not_use_args(self, tokenize) -> None:
         print(
