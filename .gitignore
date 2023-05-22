@@ -5,5 +5,3 @@ __pycache__
 #Macos
 .DS_Store
 #C-files
-*.c
-*.h

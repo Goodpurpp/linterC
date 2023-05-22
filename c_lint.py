@@ -1,7 +1,7 @@
-from config_reader.config_reader import Config_reader
+from config_reader.config_reader import ConfigReader
 from linter.linter import Linter
 from parser.parser import Parser
-from parser.parse_errors import Parse_errors
+from parser.parse_errors import ParseErrors
 from parser.cli_parse import cli_parse
 import re
 
@@ -9,15 +9,15 @@ import re
 def main():
     args = cli_parse()
     parser_files = Parser()
-    if parser_files.check_config_file(args.config) == Parse_errors.NO_CONFIG:
-        print(Parse_errors.NO_CONFIG.value)
+    if parser_files.check_config_file(args.config) == ParseErrors.NO_CONFIG:
+        print(ParseErrors.NO_CONFIG.value)
         return
 
     correct_files = list()
-    config = Config_reader(args.config)
+    config = ConfigReader(args.config)
     code = parser_files.file_extension_analyze(args.files, correct_files,
                                                config.files)
-    if code == Parse_errors.NO_EXTENSION_FILES:
+    if code == ParseErrors.NO_EXTENSION_FILES:
         print(code.value)
         return
     linter = Linter(config, correct_files)
