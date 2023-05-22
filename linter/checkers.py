@@ -1,11 +1,11 @@
 from language.clang_tokens import ClangTokens
 
 
-def is_empty_line(token) -> bool:
+def is_empty_line(token):
     return token[1] == ClangTokens.EMPTY_LINE
 
 
-def ops_before_space(first, second) -> bool:
+def ops_before_space(first, second):
     if first[0][0] != second[0][0]:
         return False
     if (first[2] == "(" and (second[1] == ClangTokens.VAR
@@ -28,6 +28,6 @@ def ops_before_space(first, second) -> bool:
     return False
 
 
-def double_space(first, second) -> bool:
+def double_space(first, second):
     return (first[1] == ClangTokens.SPACE and
             second[1] == ClangTokens.SPACE and first[0][0] == second[0][0])

@@ -2,7 +2,7 @@ import yaml
 
 
 class ConfigReader:
-    def __init__(self, config: str) -> None:
+    def __init__(self, config):
         with open(config, "r") as config_file:
             data = yaml.safe_load(config_file)
         self.files = data["files"]

@@ -17,7 +17,7 @@ def _count_args(arg, tokens):
     return count
 
 
-def _delete_not_used_args(tokenize, curr_file) -> None:
+def _delete_not_used_args(tokenize, curr_file):
     if not len(tokenize):
         return
     file = open(curr_file, "r+").readlines()
@@ -38,7 +38,7 @@ def _delete_not_used_args(tokenize, curr_file) -> None:
 
 
 class Linter:
-    def __init__(self, config: ConfigReader, correct_files: list[str]):
+    def __init__(self, config, correct_files):
         self.config = config
         self.checking_files = correct_files
         self.include_string = None
@@ -65,7 +65,7 @@ class Linter:
         self._check(tokens)
         self._not_used_vars(tokens, curr_file)
 
-    def _tokenize_str(self, curr_str, tokens, num_str) -> None:
+    def _tokenize_str(self, curr_str, tokens, num_str):
         curr_str = curr_str.replace(" ", "- -")
         curr_str = curr_str.replace("(", "-(-")
         curr_str = curr_str.replace(")", "-)-")
@@ -91,7 +91,7 @@ class Linter:
         print(self.code[tokenize[0][0] - 1])
         print(" " * tokenize[0][1] + "^")
 
-    def _check_token(self, val, tokens) -> ClangTokens:
+    def _check_token(self, val, tokens):
         token = ClangTokens.VAR
         if val in self.clang_vars.include:
             token = ClangTokens.INCLUDE
@@ -124,7 +124,7 @@ class Linter:
             pass
         return token
 
-    def _check(self, tokens) -> None:
+    def _check(self, tokens):
         count_empty_line = 0
         curr_n_spaces = 0
         summary_len_str = [0, 0]
@@ -154,13 +154,13 @@ class Linter:
             if self._check_var_with_op(tokens[i]):
                 self.__call_warning(tokens[i])
 
-    def _check_var_with_op(self, token) -> bool:
+    def _check_var_with_op(self, token):
         if token[1] != ClangTokens.VAR or token[2][-3:] != "++":
             return False
         return any(op in token[2] for op in self.clang_vars.operators if
                    op != "." and op != "*" and op != "&")
 
-    def _not_used_vars(self, tokens, curr_file) -> None:
+    def _not_used_vars(self, tokens, curr_file):
         args = [t for t in tokens if t[1] == ClangTokens.ARGS and
                 len([arg for arg in ("argc", "**argv", "main")
                      if arg != t[2]]) == 3]
@@ -171,7 +171,7 @@ class Linter:
                 args.remove(arg)
         _delete_not_used_args(args, curr_file)
 
-    def _call_not_use_args(self, tokenize) -> None:
+    def _call_not_use_args(self, tokenize):
         print(
             f"{self.curr_file}:{tokenize[0][0]}:{tokenize[0][1]} "
             f"warning:this arg or func not used")
